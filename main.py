@@ -1,14 +1,10 @@
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI,UploadFile,Request,File
-from pydantic import BaseModel
-import cv2 as cv
-import base64
-import requests
-from PIL import Image
-import numpy as np
+from fastapi import FastAPI,HTTPException
+from models import File as file
+from helper import file_saver
+from create_edit_file.filter_file import File_Filter
 
 app = FastAPI()
-
 origins = [
     "http://localhost.tiangolo.com",
     "https://localhost.tiangolo.com",
@@ -24,19 +20,14 @@ allow_methods=['*'],
 allow_headers=['*']
 )
 
-
-class Item(BaseModel):
-    file : str
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
 @app.post("/")
-async def create_upload_file(item:Item):
-    img = item.file.split(',')[-1]
-    decoded_data=base64.b64decode((img))
-    image = open('image.png','wb')
-    image.write(decoded_data)
-    return None
+async def download_file(file:file):
+    resp = file_saver(file)
+    if resp['Status_Code'] == 500:
+        raise HTTPException(status_code=resp["Status_Code"], detail=resp['body'])
+    file_obj = File_Filter(resp['body'])    
+    resp = file_obj.file_render("green")
+    if resp['Status_Code'] == 500:  
+        raise HTTPException(status_code=resp["Status_Code"], detail=resp['body'])
+
+    return resp
