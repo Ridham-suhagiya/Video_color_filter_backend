@@ -10,7 +10,7 @@ class File_Filter:
 		self.write_file_path = os.getenv('UPLOAD_FILE_FOLDER')
 		self.file_type = file_type
 		self.video_saver = cv.VideoWriter(self.file_path + '.'+ 'MP4', 
-	                         cv.VideoWriter_fourcc(*'MJPG'),
+	                         cv.VideoWriter_fourcc('m', 'p', '4', 'v'),
 	                         60, (300,300) ,isColor = True)
 		self.is_image = 0
 
@@ -25,7 +25,6 @@ class File_Filter:
 				else:
 					vid = cv.VideoCapture(self.file_path +'.'+ self.file_type)
 					status, frame= vid.read()
-				
 				b,g,r = cv.split(frame)
 				max_pixel = np.max(frame,axis = 2)
 				max_pixel_image = cv.merge([max_pixel, max_pixel, max_pixel])
