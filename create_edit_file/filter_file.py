@@ -3,28 +3,29 @@ import numpy as np
 import time
 import os
 from helper import form_response
+from constants import IMAGE_TYPES, VIDEO_TYPES
 
 class File_Filter:
-	def __init__(self,file_type):
+	def __init__(self,file):
+		print(file)
 		self.file_path = os.getenv('DOWNLOAD_FILE_FOLDER')
 		self.write_file_path = os.getenv('UPLOAD_FILE_FOLDER')
-		self.file_type = file_type
-		self.video_saver = cv.VideoWriter(self.file_path + '.'+ 'MP4', 
-	                         cv.VideoWriter_fourcc('m', 'p', '4', 'v'),
-	                         60, (300,300) ,isColor = True)
+		self.file_type = file.get('file_type')
+		self.video_saver = cv.VideoWriter(self.write_file_path, 
+	                         cv.VideoWriter_fourcc('m','p','4','v'),
+	                         60, file.get('dimensions')[-2::-1])
 		self.is_image = 0
 
 	def file_render(self, color):
 		try:
-			status = True
-			while status:
-				if self.file_type in ['jpeg','png','jpg']:
-					status = False
-					frame = cv.imread(self.file_path +'.'+  self.file_type)
-					self.is_image = 1
-				else:
-					vid = cv.VideoCapture(self.file_path +'.'+ self.file_type)
-					status, frame= vid.read()
+
+			reader_object = self.get_reader_obj()
+			while True:
+				status, frame = self.get_file_frame(reader_object)
+				if not status:
+					self.video_saver.release()
+					reader_object.release()
+					return form_response(200,"File created succesfully and saved")
 				b,g,r = cv.split(frame)
 				max_pixel = np.max(frame,axis = 2)
 				max_pixel_image = cv.merge([max_pixel, max_pixel, max_pixel])
@@ -45,10 +46,27 @@ class File_Filter:
 					cv.imwrite( self.write_file_path + '.' + self.file_type , frame)
 				else:
 					self.video_saver.write(frame)
-			return form_response(200,"File created succesfully and saved")
 		except Exception as err:
 			print(err)
 			return form_response(500,err)
-			 
+
+	def get_reader_obj(self):
+		if self.file_type in IMAGE_TYPES:
+			obj =  cv.imread(self.file_path +'.'+  self.file_type)
+			self.is_image = 1
+		elif self.file_type in VIDEO_TYPES:
+			obj =  cv.VideoCapture(self.file_path +'.'+ self.file_type)
+			self.is_image = 0
+		return obj
+
+	def get_file_frame(self, reader_object):
+		if type(reader_object) is np.ndarray:
+			return False, reader_object
+		return reader_object.read()
+			
+
+	
+
+			
 
 
