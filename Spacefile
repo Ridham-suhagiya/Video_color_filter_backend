@@ -6,5 +6,4 @@ micros:
   - name: Video-color-filter-backend
     src: ./
     engine: python3.9
-    primary: true
     dev: Env/bin/uvicorn main:app --reload
