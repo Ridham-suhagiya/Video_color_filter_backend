@@ -133,3 +133,5 @@ download_files/*
 upload_files/*
 
 .DS_STORE
+
+.space
