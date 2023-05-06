@@ -1,2 +1,5 @@
 Env
 __pycache__
+python*
+python3.9/*
+python/*

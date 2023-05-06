@@ -20,7 +20,7 @@ def file_saver(file):
 		}
 		return form_response(200,body)
 	except Exception as er:
-		print(er)
+	
 		return form_response(500,er)
 
 def save_file(file_type,decoded_data):

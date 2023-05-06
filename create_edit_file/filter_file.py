@@ -7,7 +7,6 @@ from constants import IMAGE_TYPES, VIDEO_TYPES
 
 class File_Filter:
 	def __init__(self,file):
-		print(file)
 		self.file_path = os.getenv('DOWNLOAD_FILE_FOLDER')
 		self.write_file_path = os.getenv('UPLOAD_FILE_FOLDER')
 		self.file_type = file.get('file_type')
@@ -18,7 +17,7 @@ class File_Filter:
 		self.is_image = 0
 
 	def file_render(self, color):
-		# try:
+		try:
 			reader_object = self.get_reader_obj()
 			while True:
 				status, frame = self.get_file_frame(reader_object)
@@ -45,8 +44,7 @@ class File_Filter:
 					cv.imwrite( self.write_file_path + 'output' + '.' + self.file_type , frame)
 					return form_response(200,"File created succesfully and saved")	
 				self.video_saver.write(frame)
-		# except Exception as err:
-			print(err)
+		except Exception as err:
 			return form_response(500,err)
 
 	def get_reader_obj(self):
