@@ -1,9 +1,0 @@
-# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
-v: 0
-app_name: "color_filter"
-icon: './logo-teal.png'
-micros:
-  - name: Video-color-filter-backend
-    src: ./
-    engine: python3.9
-    run: uvicorn main:app --reload

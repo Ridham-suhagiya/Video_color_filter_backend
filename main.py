@@ -16,6 +16,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
+    "*"
 ]
 PUBLIC_DIR = os.getenv("UPLOAD_FILE_FOLDER")
 app.mount("/static", StaticFiles( directory = PUBLIC_DIR), name="static")
