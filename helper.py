@@ -44,7 +44,7 @@ def create_file_url(resp):
 	else:
 		path  = os.getenv('UPLOAD_FILE_FOLDER') + '.' + file_type
 	with open(path,'rb') as f:
-	    contents = f.read()
+		contents = f.read()
 	contents = base64.b64encode(contents).decode('utf-8')
 	if file_type in IMAGE_TYPES:
 		file_url = f"data:image/{file_type};base64," + contents
