@@ -1,25 +1,30 @@
-FROM python:3-alpine AS builder
+# Use the official Python slim runtime to reduce the image size
+FROM python:3.9-slim
 
+# Set the working directory in the container
 WORKDIR /app
 
-RUN python3 -m venv venv
-ENV VIRTUAL_ENV=/app/venv
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+# Install necessary system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libopencv-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Copy only the requirements file first to leverage Docker cache
+COPY requirements.txt /app/requirements.txt
 
-# Stage 2
-FROM python:3-alpine AS runner
+# Install the dependencies specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR /app
+# Copy the current directory contents into the container
+COPY . /app
 
-COPY --from=builder /app/venv venv
-COPY main.py main.py
+# Make port 80 available to the outside world
+EXPOSE 80
 
-ENV UPLOAD_FILE_FOLDER=static/
-ENV DOWNLOAD_FILE_FOLDER=download_files/
+# Define environment variables
+ENV UPLOAD_FILE_FOLDER="static/"
+ENV DOWNLOAD_FILE_FOLDER="download_files/"
 
-EXPOSE 8000
-
-CMD [ "uvicorn", "--host", "0.0.0.0", "main:app" ]
+# Run the FastAPI app using Uvicorn
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]

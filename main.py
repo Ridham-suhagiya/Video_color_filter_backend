@@ -28,6 +28,10 @@ app.add_middleware(
     allow_headers=['*']
 )
 
+@app.get('/health')
+async def health(): 
+    return {"status": 200}
+
 @app.post("/")
 async def download_file(file:file):
     resp = file_saver(file)
